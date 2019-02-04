@@ -10,11 +10,11 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class ReadingFromFile {
-    private static Map<String, Set<String>> map = new HashMap<>();
+    private static Map<String, Set<String>> map = new HashMap<>(); //в чём соль выносить переменную, которая используется только в одном методе в поле?
 
     public static void main(String[] args) {
         Lock lock = new ReentrantLock();
-        ExecutorService service = Executors.newCachedThreadPool();
+        ExecutorService service = Executors.newCachedThreadPool();//почему именно этот пул?
 
         for (String fileName : args) {
             service.submit(() -> {
@@ -24,10 +24,10 @@ public class ReadingFromFile {
                 } catch (FileNotFoundException e) {
                     System.out.println("Файл " + fileName + " не найден");
                 }
-                try {
+                try {//Файл не найден, ошибку перехватили и всё равно пытаемся что-то начать парсить?
                     String[] titles = br.readLine().split(";");
                     for (int i = 0; i < titles.length; i++) {
-                        lock.lock();
+                        lock.lock();//Зачем?
                         if (!map.containsKey(titles[i])) {
                             map.put(titles[i], new HashSet<>());
                         }
@@ -37,7 +37,7 @@ public class ReadingFromFile {
                     while ((line = br.readLine()) != null) {
                         String[] values = line.split(";");
                         for (int i = 0; i < titles.length; i++) {
-                            lock.lock();
+                            lock.lock();//зачем?
                             Set<String> sValues = map.get(titles[i]);
                             sValues.add(values[i]);
                             map.put(titles[i], sValues);
@@ -58,7 +58,7 @@ public class ReadingFromFile {
         }
         for (Map.Entry<String, Set<String>> entry : map.entrySet()) {
             try {
-                BufferedWriter bw = new BufferedWriter(new FileWriter(entry.getKey() + ".csv"));
+                BufferedWriter bw = new BufferedWriter(new FileWriter(entry.getKey() + ".csv"));//try-with-resources?
                 Set<String> sValues = entry.getValue();
                 for (String str : sValues) {
                     bw.write(str + ";");
@@ -69,4 +69,5 @@ public class ReadingFromFile {
             }
         }
     }
+    //ООП? области видимости? Потокобезопасные коллекции? build-tools? log-frameworks? тесты?
 }
